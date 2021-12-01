@@ -1,11 +1,12 @@
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class TicTacToe {
 
-    public static void main(String[] args) {
+    static int dan = 18;
+    static ArrayList<Integer> playerPositions = new ArrayList<Integer>();
+    static ArrayList<Integer> cpuPositions = new ArrayList<Integer>();
 
-        boolean gamePlaying = false;
+    public static void main(String[] args) {
 
         char[][] gameBoard = {{' ', '|', ' ', '|', ' '},
                 {'-', '+', '-', '+', '-'},
@@ -29,6 +30,8 @@ public class TicTacToe {
                 System.out.println("Enter the position of your placement (1-9)");
                 System.out.println("You chose position: " + playerPosition);
                 placePiece(gameBoard, playerPosition, "player");
+                playerPositions.add(playerPosition);
+                System.out.println(checkWinner());
             } else {
                 while (!playerOkay){
                     System.out.println("Piece already there... ");
@@ -48,12 +51,19 @@ public class TicTacToe {
 
             if (cpuOkay){
                 placePiece(gameBoard, cpuPos, "cpu");
+                cpuPositions.add(cpuPos);
+                System.out.println(checkWinner());
             } else {
-                System.out.println("Piece already there... ");
-                cpuPos = rand.nextInt(9) + 1;
-                cpuOkay = pieceThere(gameBoard, cpuPos);
-                System.out.println();
+                while (!cpuOkay){
+                    System.out.println("Piece already there... ");
+                    cpuPos = rand.nextInt(9) + 1;
+                    cpuOkay = pieceThere(gameBoard, cpuPos);
+                    System.out.println();
+                }
+
             }
+
+            checkWinner();
 
         }
     }
@@ -71,59 +81,23 @@ public class TicTacToe {
 
         switch (position) {
             case 1:
-                if (gameBoard[0][0] == 'X' || gameBoard[0][0] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[0][0] != 'X' && gameBoard[0][0] != 'O';
             case 2:
-                if (gameBoard[0][2] == 'X' || gameBoard[0][2] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[0][2] != 'X' && gameBoard[0][2] != 'O';
             case 3:
-                if (gameBoard[0][4] == 'X' || gameBoard[0][4] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[0][4] != 'X' && gameBoard[0][4] != 'O';
             case 4:
-                if (gameBoard[2][0] == 'X' || gameBoard[2][0] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[2][0] != 'X' && gameBoard[2][0] != 'O';
             case 5:
-                if (gameBoard[2][2] == 'X' || gameBoard[2][2] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[2][2] != 'X' && gameBoard[2][2] != 'O';
             case 6:
-                if (gameBoard[2][4] == 'X' || gameBoard[2][4] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[2][4] != 'X' && gameBoard[2][4] != 'O';
             case 7:
-                if (gameBoard[4][0] == 'X' || gameBoard[4][0] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[4][0] != 'X' && gameBoard[4][0] != 'O';
             case 8:
-                if (gameBoard[4][2] == 'X' || gameBoard[4][2] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[4][2] != 'X' && gameBoard[4][2] != 'O';
             case 9:
-                if (gameBoard[4][4] == 'X' || gameBoard[4][4] == 'O') {
-                    return false;
-                } else {
-                    return true;
-                }
+                return gameBoard[4][4] != 'X' && gameBoard[4][4] != 'O';
         }
         return false;
     }
@@ -131,7 +105,7 @@ public class TicTacToe {
     public static void placePiece(char[][] gameBoard, int position, String user) {
         char player = 'X';
         char cpu = 'O';
-        char piece = user == "player" ? player : cpu;
+        char piece = Objects.equals(user, "player") ? player : cpu;
 
         switch (position) {
             case 1:
@@ -165,5 +139,39 @@ public class TicTacToe {
         printGameboard(gameBoard);
     }
 
+    public static String checkWinner(){
+        List topRow = Arrays.asList(1,2,3);
+        List middleRow = Arrays.asList(4,5,6);
+        List bottomRow = Arrays.asList(7,8,9);
+
+        List firstCol = Arrays.asList(1,4,7);
+        List secCol = Arrays.asList(2,5,8);
+        List thirdCol = Arrays.asList(3,6,9);
+
+        List crossLeft = Arrays.asList(1,5,9);
+        List crossRight = Arrays.asList(3,5,7);
+
+        List<List> winningConditions = new ArrayList<List>();
+        winningConditions.add(topRow);
+        winningConditions.add(middleRow);
+        winningConditions.add(bottomRow);
+        winningConditions.add(firstCol);
+        winningConditions.add(secCol);
+        winningConditions.add(thirdCol);
+        winningConditions.add(crossLeft);
+        winningConditions.add(crossRight);
+
+        for(List l :winningConditions){
+            if (playerPositions.containsAll(l)){
+                return "Congratulations you won!";
+            } else if (cpuPositions.containsAll(l)){
+                return "CPU wins :(...";
+            } else if (playerPositions.size() + cpuPositions.size() == 9) {
+                return "DRAW!";
+            }
+        }
+
+        return "";
+    }
 
 }
