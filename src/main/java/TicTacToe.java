@@ -2,9 +2,9 @@ import java.util.*;
 
 public class TicTacToe {
 
-    static int dan = 18;
     static ArrayList<Integer> playerPositions = new ArrayList<Integer>();
     static ArrayList<Integer> cpuPositions = new ArrayList<Integer>();
+    static boolean playing = true;
 
     public static void main(String[] args) {
 
@@ -15,9 +15,10 @@ public class TicTacToe {
                 {' ', '|', ' ', '|', ' '}};
         printGameboard(gameBoard);
 
-        while (true) {
+        while (playing) {
+            System.out.println(playerPositions.size());
+            System.out.println(cpuPositions.size());
             // First round of game
-            boolean falseMove = false;
 
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the position of your placement (1-9)");
@@ -26,21 +27,22 @@ public class TicTacToe {
 
             // Play the piece
             boolean playerOkay = pieceThere(gameBoard, playerPosition);
-            if (playerOkay){
+            if (playerOkay && playing) {
                 System.out.println("Enter the position of your placement (1-9)");
                 System.out.println("You chose position: " + playerPosition);
                 placePiece(gameBoard, playerPosition, "player");
                 playerPositions.add(playerPosition);
-                System.out.println(checkWinner());
+                checkWinner();
             } else {
-                while (!playerOkay){
+                while (!playerOkay && playing) {
                     System.out.println("Piece already there... ");
                     System.out.println("Enter the position of your placement (1-9)");
                     playerPosition = scanner.nextInt();
                     playerOkay = pieceThere(gameBoard, playerPosition);
                 }
+                placePiece(gameBoard, playerPosition, "player");
+                checkWinner();
             }
-
 
 
             // CPUs turn
@@ -49,22 +51,22 @@ public class TicTacToe {
             int cpuPos = rand.nextInt(9) + 1;
             boolean cpuOkay = pieceThere(gameBoard, cpuPos);
 
-            if (cpuOkay){
+            if (cpuOkay && playing) {
                 placePiece(gameBoard, cpuPos, "cpu");
                 cpuPositions.add(cpuPos);
-                System.out.println(checkWinner());
+                checkWinner();
             } else {
-                while (!cpuOkay){
+                while (!cpuOkay && playing) {
                     System.out.println("Piece already there... ");
+                    System.out.println(playerPositions.size());
+                    System.out.println(cpuPositions.size());
                     cpuPos = rand.nextInt(9) + 1;
                     cpuOkay = pieceThere(gameBoard, cpuPos);
                     System.out.println();
                 }
-
+                placePiece(gameBoard, cpuPos, "cpu");
+                checkWinner();
             }
-
-            checkWinner();
-
         }
     }
 
@@ -139,17 +141,17 @@ public class TicTacToe {
         printGameboard(gameBoard);
     }
 
-    public static String checkWinner(){
-        List topRow = Arrays.asList(1,2,3);
-        List middleRow = Arrays.asList(4,5,6);
-        List bottomRow = Arrays.asList(7,8,9);
+    public static void checkWinner() {
+        List topRow = Arrays.asList(1, 2, 3);
+        List middleRow = Arrays.asList(4, 5, 6);
+        List bottomRow = Arrays.asList(7, 8, 9);
 
-        List firstCol = Arrays.asList(1,4,7);
-        List secCol = Arrays.asList(2,5,8);
-        List thirdCol = Arrays.asList(3,6,9);
+        List firstCol = Arrays.asList(1, 4, 7);
+        List secCol = Arrays.asList(2, 5, 8);
+        List thirdCol = Arrays.asList(3, 6, 9);
 
-        List crossLeft = Arrays.asList(1,5,9);
-        List crossRight = Arrays.asList(3,5,7);
+        List crossLeft = Arrays.asList(1, 5, 9);
+        List crossRight = Arrays.asList(3, 5, 7);
 
         List<List> winningConditions = new ArrayList<List>();
         winningConditions.add(topRow);
@@ -161,17 +163,19 @@ public class TicTacToe {
         winningConditions.add(crossLeft);
         winningConditions.add(crossRight);
 
-        for(List l :winningConditions){
-            if (playerPositions.containsAll(l)){
-                return "Congratulations you won!";
-            } else if (cpuPositions.containsAll(l)){
-                return "CPU wins :(...";
-            } else if (playerPositions.size() + cpuPositions.size() == 9) {
-                return "DRAW!";
+        for (List l : winningConditions) {
+            if (playerPositions.containsAll(l)) {
+                System.out.println("Congratulations you won!");
+                return;
+            } else if (cpuPositions.containsAll(l)) {
+                playing = false;
+                System.out.println("CPU wins :(...");
+                return;
+            } else if (playerPositions.size() + cpuPositions.size() == 8 && playing) {
+                playing = false;
+                System.out.println("DRAW!");
+                return;
             }
         }
-
-        return "";
     }
-
 }
